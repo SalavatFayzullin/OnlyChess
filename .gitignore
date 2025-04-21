@@ -1,0 +1,16 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+instance/
+*.db
+*.db-journal
+*.db-trace
+*.db-lock
+*.db-trace
+*.db-lock
+

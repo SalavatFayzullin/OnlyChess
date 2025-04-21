@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Player Leaderboard</h1>
+
+<div class="leaderboard-container">
+    <p class="leaderboard-info">Players with at least {{ min_games }} games are ranked by win rate. Others are listed below in order of games played.</p>
+    
+    <table class="leaderboard-table">
+        <thead>
+            <tr>
+                <th class="rank-col">Rank</th>
+                <th class="name-col">Player</th>
+                <th>Games</th>
+                <th class="stat-col">Wins</th>
+                <th class="stat-col">Losses</th>
+                <th class="stat-col">Draws</th>
+                <th class="rate-col">Win Rate</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in players %}
+            <tr class="{% if player.rank == '1' %}gold-rank{% elif player.rank == '2' %}silver-rank{% elif player.rank == '3' %}bronze-rank{% elif player.rank == '-' %}unranked{% endif %}">
+                <td class="rank-col">{{ player.rank }}</td>
+                <td class="name-col">{{ player.name }}</td>
+                <td>{{ player.games_played }}</td>
+                <td class="stat-col win-stat">{{ player.wins }}</td>
+                <td class="stat-col loss-stat">{{ player.losses }}</td>
+                <td class="stat-col draw-stat">{{ player.draws }}</td>
+                <td class="rate-col">{{ player.win_rate }}%</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .leaderboard-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .leaderboard-info {
+        margin-bottom: 20px;
+        color: #666;
+        font-style: italic;
+    }
+    
+    .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .leaderboard-table th {
+        background-color: var(--dark-square);
+        color: white;
+        padding: 12px 15px;
+        text-align: left;
+        font-weight: 600;
+    }
+    
+    .leaderboard-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .leaderboard-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .leaderboard-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    
+    .leaderboard-table tr:hover {
+        background-color: #f1f1f1;
+    }
+    
+    .gold-rank {
+        background-color: rgba(255, 215, 0, 0.1) !important;
+    }
+    
+    .silver-rank {
+        background-color: rgba(192, 192, 192, 0.1) !important;
+    }
+    
+    .bronze-rank {
+        background-color: rgba(205, 127, 50, 0.1) !important;
+    }
+    
+    .unranked {
+        color: #999;
+    }
+    
+    .rank-col {
+        width: 60px;
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    .name-col {
+        width: 200px;
+        font-weight: 500;
+    }
+    
+    .stat-col {
+        width: 80px;
+        text-align: center;
+    }
+    
+    .rate-col {
+        width: 100px;
+        font-weight: bold;
+        text-align: center;
+    }
+    
+    .win-stat {
+        color: #28a745;
+    }
+    
+    .loss-stat {
+        color: #dc3545;
+    }
+    
+    .draw-stat {
+        color: #17a2b8;
+    }
+    
+    h1 {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock %} 

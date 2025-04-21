@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>New Player</h1>
+<form method="POST" action="{{ url_for('register') }}">
+    <div class="form-group">
+        <label for="name">Username</label>
+        <input type="text" id="name" name="name" required>
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+    </div>
+    <button type="submit">Join the Board</button>
+</form>
+<p>Have an account? <a href="{{ url_for('login') }}">Login</a></p>
+{% endblock %} 

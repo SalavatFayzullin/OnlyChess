@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Welcome to  OnlyChess</h1>
+
+{% if 'user_id' in session %}
+    <p>Hello, {{ user.name }}. Your position is secure.</p>
+    
+    <div id="chess-app">
+        <div class="game-options">
+            <form action="{{ url_for('join_queue') }}" method="post">
+                <button type="submit" class="chess-btn">Find an Opponent</button>
+            </form>
+            
+            {% if active_game %}
+            <div class="active-game-notice">
+                <p>You have an active game in progress.</p>
+                <a href="{{ url_for('game_page', game_id=active_game.id) }}" class="chess-btn secondary-btn">Resume Game</a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="stats-container">
+            <h2>Player Statistics</h2>
+            
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <h3>Games Played</h3>
+                    <div class="stat-value">{{ user.games_played }}</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Win Rate</h3>
+                    <div class="stat-value">{{ user.win_rate() }}%</div>
+                </div>
+                
+                <div class="stat-card win">
+                    <h3>Wins</h3>
+                    <div class="stat-value">{{ user.games_won }}</div>
+                </div>
+                
+                <div class="stat-card loss">
+                    <h3>Losses</h3>
+                    <div class="stat-value">{{ user.games_lost }}</div>
+                </div>
+                
+                <div class="stat-card draw">
+                    <h3>Draws</h3>
+                    <div class="stat-value">{{ user.games_drawn }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-history">
+            <h2>Recent Games</h2>
+            
+            {% if game_history %}
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Opponent</th>
+                        <th>Your Color</th>
+                        <th>Result</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for game in game_history %}
+                    <tr class="game-row {{ game.result_class }}">
+                        <td>{{ game.date }}</td>
+                        <td>{{ game.opponent }}</td>
+                        <td>
+                            {% if game.player_color == 'white' %}
+                            <span class="piece white-piece">♙</span>
+                            {% else %}
+                            <span class="piece black-piece">♟</span>
+                            {% endif %}
+                        </td>
+                        <td class="result {{ game.result_class }}">{{ game.result }}</td>
+                        <td>
+                            {% if game.timeout is defined %}
+                            <span class="timeout-info">{{ game.timeout }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="no-games">No games played yet. Start playing to build your history!</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <style>
+        #chess-app {
+            margin-top: 30px;
+        }
+        
+        .game-options {
+            margin-bottom: 20px;
+        }
+        
+        .chess-btn {
+            background-color: var(--dark-square);
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .chess-btn:hover {
+            background-color: #658046;
+        }
+        
+        .secondary-btn {
+            background-color: #888;
+            margin-left: 10px;
+        }
+        
+        .secondary-btn:hover {
+            background-color: #666;
+        }
+        
+        .active-game-notice {
+            margin-top: 20px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid var(--dark-square);
+        }
+        
+        .stats-container {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-top: 4px solid #888;
+        }
+        
+        .stat-card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #666;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-card.win {
+            border-top-color: #28a745;
+        }
+        
+        .stat-card.loss {
+            border-top-color: #dc3545;
+        }
+        
+        .stat-card.draw {
+            border-top-color: #17a2b8;
+        }
+        
+        .game-history {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 30px;
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .history-table th,
+        .history-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .history-table th {
+            background-color: #f1f1f1;
+            font-weight: 600;
+        }
+        
+        .history-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .game-row:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .piece {
+            font-size: 20px;
+            display: inline-block;
+        }
+        
+        .white-piece {
+            color: white;
+            text-shadow: 0px 0px 1px black, 0px 0px 1px black, 0px 0px 1px black;
+        }
+        
+        .black-piece {
+            color: black;
+            text-shadow: 0px 0px 1px white, 0px 0px 1px white, 0px 0px 1px white;
+        }
+        
+        .result {
+            font-weight: 600;
+        }
+        
+        .result.win {
+            color: #28a745;
+        }
+        
+        .result.loss {
+            color: #dc3545;
+        }
+        
+        .result.draw {
+            color: #17a2b8;
+        }
+        
+        .timeout-info {
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .no-games {
+            text-align: center;
+            padding: 15px;
+            color: #6c757d;
+        }
+    </style>
+{% else %}
+    <p>Please login or register to join the board.</p>
+{% endif %}
+{% endblock %} 
